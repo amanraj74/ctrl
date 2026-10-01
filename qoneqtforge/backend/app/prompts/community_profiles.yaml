@@ -1,0 +1,59 @@
+# Community Profiles for Qoneqt
+# These profiles adapt content tone, CTA style, and hashtags per community.
+# Note: profiles are our assumption of Qoneqt communities; adjust after viewing the real feed.
+
+tech:
+  audience: "developers, tech enthusiasts, early adopters"
+  tone_notes: "informative but exciting, use tech terms freely, reference real tools/platforms"
+  cta_style: "Ask viewers to share their experience or favorite tools in comments"
+  hashtag_seeds: ["#Tech", "#Programming", "#AI", "#Innovation", "#Coding"]
+  taboo: ["oversimplified analogies", "fear-mongering about AI"]
+
+startup:
+  audience: "founders, entrepreneurs, business enthusiasts"
+  tone_notes: "inspiring, data-driven, practical advice, reference real companies"
+  cta_style: "Invite viewers to share their startup journey or ask for advice"
+  hashtag_seeds: ["#Startup", "#Entrepreneur", "#Business", "#Growth", "#Funding"]
+  taboo: ["get-rich-quick promises", "unverified success claims"]
+
+fitness:
+  audience: "health-conscious individuals, gym-goers, athletes"
+  tone_notes: "motivational, science-backed, practical tips, energetic"
+  cta_style: "Challenge viewers to try the workout or share their fitness goals"
+  hashtag_seeds: ["#Fitness", "#Health", "#Workout", "#Motivation", "#GymLife"]
+  taboo: ["extreme diets", "unproven supplements", "body shaming"]
+
+finance:
+  audience: "young professionals, students learning about money"
+  tone_notes: "simple, jargon-free, relatable examples, encouraging"
+  cta_style: "Ask viewers what money topic they want explained next"
+  hashtag_seeds: ["#Finance", "#MoneyTips", "#Investing", "#Savings", "#FinancialLiteracy"]
+  taboo: ["specific stock tips", "guaranteed returns", "crypto shilling"]
+
+travel:
+  audience: "travel enthusiasts, backpackers, culture lovers"
+  tone_notes: "vivid, storytelling, sensory descriptions, wanderlust-inducing"
+  cta_style: "Ask viewers to share their favorite travel memory or bucket list"
+  hashtag_seeds: ["#Travel", "#Wanderlust", "#Explore", "#Adventure", "#TravelTips"]
+  taboo: ["cultural insensitivity", "unsafe travel advice"]
+
+education:
+  audience: "students, lifelong learners, teachers"
+  tone_notes: "clear, engaging, uses analogies, makes complex topics accessible"
+  cta_style: "Ask viewers what topic they want explained next"
+  hashtag_seeds: ["#Education", "#Learning", "#Knowledge", "#StudyTips", "#Facts"]
+  taboo: ["misinformation", "academic dishonesty promotion"]
+
+gaming:
+  audience: "gamers, esports fans, game developers"
+  tone_notes: "hyped, reference popular games, community-driven"
+  cta_style: "Ask viewers for their takes or favorite games"
+  hashtag_seeds: ["#Gaming", "#Gamer", "#Esports", "#GameDev", "#PlayStation"]
+  taboo: ["gambling promotion", "toxic gaming culture"]
+
+general:
+  audience: "broad audience, casual viewers on the feed"
+  tone_notes: "universally appealing, conversational, fun, surprising"
+  cta_style: "Invite viewers to comment their thoughts or share with friends"
+  hashtag_seeds: ["#Trending", "#Viral", "#Facts", "#MindBlown", "#Qoneqt"]
+  taboo: ["divisive politics", "religious debates", "hate speech"]

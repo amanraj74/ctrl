@@ -1,0 +1,50 @@
+[
+  {
+    "filename": "upbeat_energy.mp3",
+    "mood": "upbeat",
+    "bpm": 120,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License (free for commercial use)",
+    "duration_sec": 120
+  },
+  {
+    "filename": "ambient_calm.mp3",
+    "mood": "ambient",
+    "bpm": 80,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License",
+    "duration_sec": 180
+  },
+  {
+    "filename": "motivational_rise.mp3",
+    "mood": "motivational",
+    "bpm": 100,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License",
+    "duration_sec": 150
+  },
+  {
+    "filename": "tech_electronic.mp3",
+    "mood": "tech",
+    "bpm": 128,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License",
+    "duration_sec": 120
+  },
+  {
+    "filename": "cinematic_epic.mp3",
+    "mood": "cinematic",
+    "bpm": 90,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License",
+    "duration_sec": 200
+  },
+  {
+    "filename": "playful_fun.mp3",
+    "mood": "playful",
+    "bpm": 130,
+    "source": "Pixabay Music",
+    "license": "Pixabay Content License",
+    "duration_sec": 100
+  }
+]
