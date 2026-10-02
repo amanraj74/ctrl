@@ -34,7 +34,7 @@ class PollinationsProvider(ImageProvider):
         encoded_prompt = quote(prompt, safe="")
         url = (
             f"https://image.pollinations.ai/prompt/{encoded_prompt}"
-            f"?width={width}&height={height}&seed={seed}&nologo=true&model=flux"
+            f"?width={width}&height={height}&seed={seed}"
         )
 
         logger.info("Pollinations request: seed=%d, prompt=%s...", seed, prompt[:80])

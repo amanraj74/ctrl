@@ -77,6 +77,8 @@ async def run(job_id: str, scene_plan: ScenePlan) -> list[dict]:
 
     async def _bounded_generate(scene) -> dict:
         async with semaphore:
+            # Stagger requests slightly to avoid rate limiting
+            await asyncio.sleep(scene.idx * 1.5)
             return await _generate_scene_image(
                 job_id=job_id,
                 scene_idx=scene.idx,

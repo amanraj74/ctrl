@@ -15,11 +15,12 @@ from app.providers.base import LLMProvider, ProviderError, RateLimitError
 from app.providers.llm_gemini import GeminiProvider
 from app.providers.llm_groq import GroqProvider
 from app.providers.llm_ollama import OllamaProvider
+from app.providers.llm_openrouter import OpenRouterProvider
 
 logger = logging.getLogger(__name__)
 
 # Default fallback chain order
-DEFAULT_CHAIN: list[type[LLMProvider]] = [GeminiProvider, GroqProvider, OllamaProvider]
+DEFAULT_CHAIN: list[type[LLMProvider]] = [GeminiProvider, GroqProvider, OpenRouterProvider, OllamaProvider]
 
 # Track which provider served each request (for UI display)
 _last_provider: str = "none"

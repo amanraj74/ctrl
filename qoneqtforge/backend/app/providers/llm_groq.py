@@ -24,14 +24,18 @@ class GroqProvider(LLMProvider):
         self._client = None
 
     def _get_client(self):
-        if self._client is None:
-            try:
-                from groq import Groq
+        try:
+            import random
 
-                self._client = Groq(api_key=settings.groq_api_key)
-            except Exception as e:
-                raise ProviderError(f"Failed to initialize Groq: {e}") from e
-        return self._client
+            from groq import Groq
+
+            keys = [k.strip() for k in settings.groq_api_key.split(",") if k.strip()]
+            if not keys:
+                raise ProviderError("No Groq API keys available")
+            key = random.choice(keys)
+            return Groq(api_key=key)
+        except Exception as e:
+            raise ProviderError(f"Failed to initialize Groq: {e}") from e
 
     async def is_available(self) -> bool:
         return bool(settings.groq_api_key)
@@ -52,9 +56,12 @@ class GroqProvider(LLMProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        # Groq on_demand tier has a strict 1000 Output Tokens Per Minute (OTPM) limit.
+        max_tokens = min(max_tokens, 900)
+
         try:
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="qwen/qwen3.8-27b",
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -92,9 +99,12 @@ class GroqProvider(LLMProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        # Groq on_demand tier has a strict 1000 Output Tokens Per Minute (OTPM) limit.
+        max_tokens = min(max_tokens, 900)
+
         try:
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="qwen/qwen3.8-27b",
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,

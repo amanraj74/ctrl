@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 
 from app.schemas import ExportPack, Script
-from app.utils.paths import get_export_dir, get_final_video_path, get_job_dir
+from app.utils.paths import get_export_dir, get_job_dir
 
 logger = logging.getLogger(__name__)
 

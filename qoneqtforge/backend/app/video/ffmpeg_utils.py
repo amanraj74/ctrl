@@ -13,9 +13,14 @@ logger = logging.getLogger(__name__)
 def get_ffmpeg_path() -> str:
     """Get the FFmpeg executable path."""
     path = shutil.which("ffmpeg")
-    if path is None:
-        raise RuntimeError("FFmpeg not found. Install FFmpeg and ensure it's on PATH.")
-    return path
+    if path:
+        return path
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except ImportError:
+        pass
+    raise RuntimeError("FFmpeg not found. Install FFmpeg or pip install imageio-ffmpeg.")
 
 
 def get_ffprobe_path() -> str:

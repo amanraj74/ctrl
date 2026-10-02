@@ -78,7 +78,7 @@ This document tracks the detailed status of the QoneqtForge project. It serves a
 1. **API Keys:** Add free-tier API keys to the `.env` file (Gemini, Groq, Cloudflare, Pexels).
 2. **Install FFmpeg:** Ensure FFmpeg is installed on your Windows machine and available in the system PATH.
 3. **Download Sample Music:** Add a few MP3 files to `backend/assets/music/` and update `music.json` so the pipeline can add background music.
-4. **End-to-End Test:** Run the application locally and generate the first video to verify FFmpeg and API connections.
+4. **Deploy Application:** Deploy backend to Railway and frontend to Vercel for public access.
 
 ---
 

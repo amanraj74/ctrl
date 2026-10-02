@@ -12,11 +12,10 @@ from app.core.events import (
     emit_job_failed,
     emit_log,
     emit_stage_complete,
-    emit_stage_failed,
     emit_stage_start,
 )
 from app.db import get_session
-from app.models import Asset, Job, LogLine, StageRun
+from app.models import Job, LogLine, StageRun
 from app.schemas import BriefSpec
 from app.stages import (
     s01_ingest,

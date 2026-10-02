@@ -20,8 +20,10 @@ async def run(job_id: str, brief: BriefSpec, scene_plan: ScenePlan) -> list[dict
     """
     logger.info("[%s] Stage 7: Voice — %d scenes, lang=%s", job_id, len(scene_plan.scenes), brief.language)
 
-    # Try edge-tts first, then piper/pyttsx3
-    tts_providers = [EdgeTTSProvider(), PiperTTSProvider()]
+    from app.providers.tts_elevenlabs import ElevenLabsProvider
+
+    # Try ElevenLabs first (premium), then edge-tts, then piper
+    tts_providers = [ElevenLabsProvider(), EdgeTTSProvider(), PiperTTSProvider()]
     tts_provider = None
 
     for provider in tts_providers:

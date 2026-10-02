@@ -24,15 +24,19 @@ class GeminiProvider(LLMProvider):
         self._client = None
 
     def _get_client(self):
-        if self._client is None:
-            try:
-                import google.generativeai as genai
+        try:
+            import random
 
-                genai.configure(api_key=settings.gemini_api_key)
-                self._client = genai
-            except Exception as e:
-                raise ProviderError(f"Failed to initialize Gemini: {e}") from e
-        return self._client
+            import google.generativeai as genai
+
+            keys = [k.strip() for k in settings.gemini_api_key.split(",") if k.strip()]
+            if not keys:
+                raise ProviderError("No Gemini API keys available")
+            key = random.choice(keys)
+            genai.configure(api_key=key)
+            return genai
+        except Exception as e:
+            raise ProviderError(f"Failed to initialize Gemini: {e}") from e
 
     async def is_available(self) -> bool:
         return bool(settings.gemini_api_key)
@@ -49,7 +53,7 @@ class GeminiProvider(LLMProvider):
         genai = self._get_client()
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-3.8-flash",
             system_instruction=system_prompt if system_prompt else None,
             generation_config=genai.GenerationConfig(
                 temperature=temperature,
@@ -93,7 +97,7 @@ class GeminiProvider(LLMProvider):
         genai = self._get_client()
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-3.8-flash",
             system_instruction=system_prompt if system_prompt else None,
             generation_config=genai.GenerationConfig(
                 temperature=temperature,

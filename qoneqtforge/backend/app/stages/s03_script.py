@@ -20,7 +20,7 @@ def _load_community_profile(community: str) -> str:
     """Load community profile from YAML."""
     profiles_path = Path(__file__).parent.parent / "prompts" / "community_profiles.yaml"
     try:
-        with open(profiles_path, "r", encoding="utf-8") as f:
+        with open(profiles_path, encoding="utf-8") as f:
             profiles = yaml.safe_load(f)
         profile = profiles.get(community, profiles.get("general", {}))
         return yaml.dump(profile, default_flow_style=False)

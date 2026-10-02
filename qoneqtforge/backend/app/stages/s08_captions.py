@@ -6,7 +6,7 @@ import json
 import logging
 from pathlib import Path
 
-from app.utils.paths import get_captions_path, get_scene_timings_path
+from app.utils.paths import get_captions_path
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ async def run(job_id: str, voice_results: list[dict]) -> str:
         word_timings = voice_result.get("word_timings", [])
 
         if not word_timings and timings_path and Path(timings_path).exists():
-            with open(timings_path, "r", encoding="utf-8") as f:
+            with open(timings_path, encoding="utf-8") as f:
                 word_timings = json.load(f)
 
         # Add offset for scene position in the video

@@ -14,9 +14,14 @@ class Settings(BaseSettings):
     # === LLM Providers ===
     gemini_api_key: str = ""
     groq_api_key: str = ""
+    openrouter_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
 
+    # === Voice Providers ===
+    elevenlabs_api_key: str = ""
+
     # === Image Providers ===
+    hf_token: str = ""
     pexels_api_key: str = ""
     pixabay_api_key: str = ""
     cloudflare_account_id: str = ""
@@ -25,7 +30,7 @@ class Settings(BaseSettings):
     # === App Config ===
     max_concurrent_jobs: int = 2
     default_language: Literal["en", "hi", "gu"] = "en"
-    default_duration: Literal[20, 30, 45, 60] = 30
+    default_duration: int = 30
     default_community: str = "general"
 
     # === Deployment ===
@@ -64,7 +69,7 @@ class Settings(BaseSettings):
         return self.assets_dir / "brand"
 
     model_config = {
-        "env_file": ".env",
+        "env_file": "../.env",
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

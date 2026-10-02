@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { getJob, getVideoUrl, getExportUrl, type JobResponse, type StageInfo } from '@/lib/api';
 import { subscribeToJob, type SSEEvent } from '@/lib/sse';
-import { STAGE_NAMES, STAGE_LABELS, type StageName } from '@/lib/types';
+import { STAGE_NAMES, STAGE_LABELS, STAGE_ICONS, type StageName } from '@/lib/types';
 
 export default function JobPage() {
   const { id } = useParams() as { id: string };
@@ -32,11 +32,10 @@ export default function JobPage() {
     let logId = 0;
     const cleanup = subscribeToJob(id, (event: SSEEvent) => {
       if (event.type === 'log') {
-        setLogs(prev => [...prev, { id: logId++, ...event.data, timestamp: event.timestamp }]);
+        setLogs(prev => [...prev, { id: logId++, ...(event.data as { level: string; stage: string; message: string }), timestamp: event.timestamp }]);
       } else if (
-        ['stage_start', 'stage_complete', 'stage_failed', 'job_complete', 'job_failed'].includes(event.type)
+        ['stage_start', 'stage_complete', 'stage_failed', 'job_complete', 'job_failed', 'reconnect'].includes(event.type)
       ) {
-        // Refresh job state on major events
         getJob(id).then(setJob).catch(console.error);
 
         if (event.type === 'job_complete' || event.type === 'job_failed') {
@@ -56,9 +55,12 @@ export default function JobPage() {
   if (!job) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-white/50">Loading job details...</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-full animate-spin" style={{
+            border: '3px solid hsla(258, 100%, 65%, 0.15)',
+            borderTopColor: 'var(--accent)',
+          }} />
+          <p style={{ color: 'var(--text-muted)' }}>Loading pipeline...</p>
         </div>
       </div>
     );
@@ -79,83 +81,107 @@ export default function JobPage() {
     return '';
   };
 
-  const progressPercent = Math.max(
-    5,
-    Math.min(100, (STAGE_NAMES.findIndex(s => s === job.current_stage) + 1) / STAGE_NAMES.length * 100)
-  );
+  const completedStages = STAGE_NAMES.filter(s => getStageStatus(s) === 'completed').length;
+  const progressPercent = job.status === 'completed'
+    ? 100
+    : Math.max(3, (completedStages / STAGE_NAMES.length) * 100);
+
+  const statusClass =
+    job.status === 'completed' ? 'completed' :
+    job.status === 'failed' ? 'failed' :
+    job.status === 'processing' ? 'processing' : 'queued';
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-bold text-white">Pipeline: {job.brief.topic}</h1>
-          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-            job.status === 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-            job.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-            'bg-accent/20 text-accent-light border border-accent/30 pulse-glow'
-          }`}>
-            {job.status.toUpperCase()}
-          </span>
+
+      {/* ── Header ──────────────────────────────────────────── */}
+      <div className="mb-8 animate-fade-up">
+        <div className="flex items-start gap-4 mb-1">
+          <div>
+            <div className="flex items-center gap-3 mb-1.5">
+              <h1 className="font-display text-2xl md:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                {job.brief.topic}
+              </h1>
+              <span className={`status-badge ${statusClass}`}>
+                {job.status === 'processing' && (
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent-light)' }} />
+                )}
+                {job.status}
+              </span>
+            </div>
+            <p className="text-sm font-mono" style={{ color: 'var(--text-muted)' }}>
+              Job ID: {job.id}
+            </p>
+          </div>
         </div>
-        <p className="text-white/50 text-sm font-mono">ID: {job.id}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Pipeline Stages */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ── Left: Pipeline ────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold mb-6 flex items-center justify-between">
-              <span>Pipeline Progress</span>
+
+          {/* Progress Card */}
+          <div className="glass-card p-6 animate-fade-up delay-100">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-display font-semibold text-base" style={{ color: 'var(--text-primary)' }}>
+                Pipeline Progress
+              </h2>
               {job.status === 'processing' && (
-                <span className="text-sm font-normal text-accent-light flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-ping"></span> Live
+                <span className="flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--accent-light)' }}>
+                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+                  Live
                 </span>
               )}
-            </h2>
+              {job.status === 'completed' && (
+                <span className="flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--success)' }}>
+                  ✓ Complete
+                </span>
+              )}
+            </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-2 bg-white/5 rounded-full mb-8 overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-accent-dark to-accent-light transition-all duration-500 ease-out relative"
-                style={{ width: `${job.status === 'completed' ? 100 : progressPercent}%` }}
-              >
-                {job.status === 'processing' && (
-                  <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent)] bg-[length:200%_100%] animate-[shimmer_2s_infinite]" />
-                )}
-              </div>
+            <div className="progress-track mb-6">
+              <div
+                className={`progress-fill ${job.status === 'processing' ? 'active' : ''}`}
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
 
             {/* Stage List */}
-            <div className="space-y-4">
-              {STAGE_NAMES.map((stageName, idx) => {
+            <div className="space-y-2">
+              {STAGE_NAMES.map((stageName) => {
                 const status = getStageStatus(stageName);
                 const duration = getStageDuration(stageName);
-                
+
                 return (
-                  <div key={stageName} className={`flex items-center p-3 rounded-lg border transition-all duration-300 ${
-                    status === 'running' ? 'bg-accent/10 border-accent/30 glow' :
-                    status === 'completed' ? 'bg-white/5 border-white/10 opacity-80' :
-                    status === 'failed' ? 'bg-red-500/10 border-red-500/30' :
-                    'border-transparent opacity-40'
-                  }`}>
-                    {/* Status Icon */}
-                    <div className="w-10 flex justify-center">
-                      {status === 'completed' ? <span className="text-green-400">✓</span> :
-                       status === 'failed' ? <span className="text-red-400">✗</span> :
-                       status === 'running' ? (
-                         <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-                       ) : <span className="text-white/20">{idx + 1}</span>}
+                  <div key={stageName} className={`stage-item ${status}`}>
+                    {/* Icon */}
+                    <div className="w-10 flex justify-center text-base">
+                      {status === 'completed' ? (
+                        <span style={{ color: 'var(--success)' }}>✓</span>
+                      ) : status === 'failed' ? (
+                        <span style={{ color: 'var(--error)' }}>✗</span>
+                      ) : status === 'running' ? (
+                        <div className="w-4 h-4 rounded-full animate-spin" style={{
+                          border: '2px solid hsla(258, 100%, 65%, 0.2)',
+                          borderTopColor: 'var(--accent)',
+                        }} />
+                      ) : (
+                        <span>{STAGE_ICONS[stageName]}</span>
+                      )}
                     </div>
 
-                    {/* Stage Name */}
-                    <div className="flex-1 font-medium text-white/90">
+                    {/* Name */}
+                    <div className="flex-1 text-sm font-medium" style={{
+                      color: status === 'pending' ? 'var(--text-muted)' : 'var(--text-primary)',
+                    }}>
                       {STAGE_LABELS[stageName]}
                     </div>
 
                     {/* Duration */}
                     {duration && (
-                      <div className="text-sm font-mono text-white/40">
+                      <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                         {duration}
                       </div>
                     )}
@@ -166,16 +192,18 @@ export default function JobPage() {
           </div>
 
           {/* Logs */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold mb-4">Live Logs</h2>
+          <div className="glass-card p-6 animate-fade-up delay-200">
+            <h2 className="font-display font-semibold text-base mb-4" style={{ color: 'var(--text-primary)' }}>
+              Live Logs
+            </h2>
             <div className="log-console">
               {logs.length === 0 ? (
-                <div className="text-white/30 italic">Waiting for logs...</div>
+                <div className="italic" style={{ color: 'var(--text-muted)' }}>Waiting for pipeline events...</div>
               ) : (
                 logs.map(log => (
                   <div key={log.id} className={`log-line ${log.level}`}>
-                    <span className="text-white/30 mr-2">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
-                    <span className="text-white/50 mr-2">[{log.stage}]</span>
+                    <span style={{ color: 'var(--text-muted)' }}>[{new Date(log.timestamp).toLocaleTimeString()}]</span>{' '}
+                    <span style={{ color: 'var(--accent-light)' }}>[{log.stage}]</span>{' '}
                     <span>{log.message}</span>
                   </div>
                 ))
@@ -185,50 +213,67 @@ export default function JobPage() {
           </div>
         </div>
 
-        {/* Right Column: Result / Preview */}
+        {/* ── Right: Preview ────────────────────────────────── */}
         <div className="space-y-6">
-          <div className="glass-card p-6 sticky top-24">
-            <h2 className="text-lg font-semibold mb-6 text-center">Final Output</h2>
-            
+          <div className="glass-card p-6 sticky top-24 animate-fade-up delay-200">
+            <h2 className="font-display font-semibold text-base mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
+              Final Output
+            </h2>
+
             <div className="flex flex-col items-center">
-              <div className="phone-frame mb-6">
+              <div className="phone-frame mb-6 float">
                 {job.status === 'completed' && job.video_url ? (
-                  <video 
-                    src={getVideoUrl(job.id)} 
-                    controls 
-                    autoPlay 
+                  <video
+                    src={getVideoUrl(job.id)}
+                    controls
+                    autoPlay
                     loop
                     className="w-full h-full object-cover"
                   />
                 ) : job.status === 'failed' ? (
-                  <div className="w-full h-full flex items-center justify-center bg-red-950/20 text-red-400 p-6 text-center">
-                    Pipeline Failed
-                    <br />
-                    {job.error || 'Unknown error'}
+                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center" style={{
+                    background: 'hsla(0, 40%, 10%, 0.8)',
+                  }}>
+                    <span className="text-3xl mb-3">⚠️</span>
+                    <p className="text-sm font-medium" style={{ color: 'var(--error)' }}>Pipeline Failed</p>
+                    <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>{job.error || 'Unknown error'}</p>
                   </div>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-black/50 p-6 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-accent/20 to-transparent opacity-50" />
-                    <div className="w-12 h-12 border-4 border-accent/30 border-t-accent rounded-full animate-spin mb-4 relative z-10" />
-                    <p className="text-sm text-white/50 relative z-10 font-medium">Forging Video...</p>
-                    <p className="text-xs text-white/30 mt-2 relative z-10">This takes ~1-2 minutes</p>
+                  <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden" style={{
+                    background: 'linear-gradient(180deg, hsla(258, 30%, 8%, 1), hsla(240, 20%, 4%, 1))',
+                  }}>
+                    <div className="absolute inset-0" style={{
+                      background: 'radial-gradient(circle at 50% 40%, hsla(258, 80%, 50%, 0.1), transparent 60%)',
+                    }} />
+                    <div className="w-12 h-12 rounded-full animate-spin mb-4 relative z-10" style={{
+                      border: '3px solid hsla(258, 100%, 65%, 0.15)',
+                      borderTopColor: 'var(--accent)',
+                    }} />
+                    <p className="text-sm font-medium relative z-10" style={{ color: 'var(--text-secondary)' }}>
+                      Forging video...
+                    </p>
+                    <p className="text-xs mt-2 relative z-10" style={{ color: 'var(--text-muted)' }}>
+                      This takes ~1-2 minutes
+                    </p>
                   </div>
                 )}
               </div>
 
               {job.status === 'completed' && (
                 <div className="w-full space-y-3">
-                  <a 
+                  <a
                     href={getExportUrl(job.id)}
                     download
-                    className="btn-primary w-full flex items-center justify-center gap-2 py-3"
+                    className="btn-primary w-full flex items-center justify-center gap-2 py-3.5"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     Download Export Pack
                   </a>
-                  <p className="text-xs text-center text-white/40">Includes MP4, thumbnail, caption & hashtags</p>
+                  <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                    Includes MP4, thumbnail, caption & hashtags
+                  </p>
                 </div>
               )}
             </div>

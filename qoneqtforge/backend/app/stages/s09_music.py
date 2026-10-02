@@ -6,7 +6,6 @@ import json
 import logging
 import random
 import shutil
-from pathlib import Path
 
 from app.config import settings
 from app.schemas import BriefSpec
@@ -28,7 +27,7 @@ def _load_music_catalog() -> list[dict]:
     """Load the music catalog from assets/music/music.json."""
     catalog_path = settings.music_dir / "music.json"
     if catalog_path.exists():
-        with open(catalog_path, "r", encoding="utf-8") as f:
+        with open(catalog_path, encoding="utf-8") as f:
             return json.load(f)
     return []
 

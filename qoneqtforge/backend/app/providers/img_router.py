@@ -14,12 +14,13 @@ from PIL import Image
 
 from app.providers.base import ImageProvider, ProviderError
 from app.providers.img_cloudflare import CloudflareImageProvider
+from app.providers.img_huggingface import HuggingFaceProvider
 from app.providers.img_pexels import PexelsProvider
 from app.providers.img_pollinations import PollinationsProvider
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CHAIN: list[type[ImageProvider]] = [PollinationsProvider, CloudflareImageProvider, PexelsProvider]
+DEFAULT_CHAIN: list[type[ImageProvider]] = [HuggingFaceProvider, PollinationsProvider, CloudflareImageProvider, PexelsProvider]
 
 _last_provider: str = "none"
 

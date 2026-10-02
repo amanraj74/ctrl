@@ -20,7 +20,7 @@ from app.schemas import BriefSpec
 
 async def main(topic: str) -> None:
     print(f"\n{'='*60}")
-    print(f"  QoneqtForge — Sample Generation")
+    print("  QoneqtForge — Sample Generation")
     print(f"  Topic: {topic}")
     print(f"{'='*60}\n")
 
@@ -31,7 +31,7 @@ async def main(topic: str) -> None:
     print("▶ Stage 1: Ingest...")
     from app.stages import s01_ingest
     brief = await s01_ingest.run(job_id, brief)
-    print(f"  ✓ Brief validated\n")
+    print("  ✓ Brief validated\n")
 
     # Stage 2: Research
     print("▶ Stage 2: Research...")

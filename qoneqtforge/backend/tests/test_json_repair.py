@@ -1,12 +1,13 @@
 """Tests for JSON repair utility."""
 
 import pytest
+
 from app.utils.json_repair import (
-    strip_markdown_fences,
-    fix_trailing_commas,
     balance_braces,
     extract_json_object,
+    fix_trailing_commas,
     repair_json,
+    strip_markdown_fences,
 )
 
 

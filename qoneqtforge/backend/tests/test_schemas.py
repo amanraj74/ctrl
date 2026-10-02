@@ -1,7 +1,6 @@
 """Tests for Pydantic schemas — validates all data contracts."""
 
-import pytest
-from app.schemas import BriefSpec, Script, Beat, Scene, ScenePlan, CriticReport, QACheck, QAReport
+from app.schemas import Beat, BriefSpec, CriticReport, QACheck, QAReport, Scene, ScenePlan, Script
 
 
 class TestBriefSpec:
