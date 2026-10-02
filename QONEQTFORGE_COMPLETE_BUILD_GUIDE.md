@@ -126,10 +126,10 @@ QoneqtForge is an **AI-powered content pipeline** that:
 
 | Component | Tool | Cost |
 |---|---|---|
-| Backend | Hugging Face Spaces (Docker, free CPU) | Free |
+| Backend | Railway.app (Docker) | Free Tier ($5 credit, zero cost setup) |
 | Frontend | Vercel | Free tier |
 | CI/CD | GitHub Actions | Free for public repos |
-| Storage | Local disk + HF Dataset repo | Free |
+| Storage | Local disk / Railway volume | Free |
 
 ### Development
 
