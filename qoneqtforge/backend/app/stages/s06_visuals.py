@@ -73,12 +73,11 @@ async def run(job_id: str, scene_plan: ScenePlan) -> list[dict]:
     )
 
     # Generate all scene images in parallel (with concurrency limit)
-    semaphore = asyncio.Semaphore(3)  # Max 3 concurrent image generations
+    # Semaphore set to 1 because Pollinations free tier rejects concurrent requests (402 Error)
+    semaphore = asyncio.Semaphore(1)
 
     async def _bounded_generate(scene) -> dict:
         async with semaphore:
-            # Stagger requests slightly to avoid rate limiting
-            await asyncio.sleep(scene.idx * 1.5)
             return await _generate_scene_image(
                 job_id=job_id,
                 scene_idx=scene.idx,
